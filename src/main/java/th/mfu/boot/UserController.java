@@ -15,22 +15,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    public static Map<String, User> users = new HashMap<String, User>();
+    public static Map<String, User> users = new HashMap<>();
 
-   
-    public ResponseEntity<String> registerUser( User user) {
-      //TODO
-      return null;
+    // Register user
+    @PostMapping("/users")
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
+        if (users.containsKey(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Username already exists");
+        }
+        users.put(user.getUsername(), user);
+        return ResponseEntity.ok("User registered successfully");
     }
 
+    // List users
+    @GetMapping("/users")
     public ResponseEntity<Collection<User>> list() {
-        //TODO
-        return null;
+        return ResponseEntity.ok(users.values());
     }
 
-    public ResponseEntity<User> getUser(String username) {
-        //TODO
-        return null;
+    // Get specific user
+    @GetMapping("/users/{username}")
+    public ResponseEntity<User> getUser(@PathVariable String username) {
+        User user = users.get(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(user);
     }
-    
 }
